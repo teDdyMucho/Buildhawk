@@ -1,48 +1,43 @@
 import type { LeadSegment } from '../data/mockData';
 import StatusBadge from './StatusBadge';
 
-interface Props {
-  segments: LeadSegment[];
-}
+const C = { white: '#FFFFFF', bg: '#F4F5F7', dark: '#2E2E2E', mid: '#6E6E6E', border: '#F15A24', orange: '#F15A24' };
 
-function formatCurrency(n: number): string {
+function fmt(n: number) {
   if (n >= 1_000_000) return `$${(n / 1_000_000).toFixed(2)}M`;
-  if (n >= 1_000) return `$${(n / 1_000).toFixed(0)}K`;
+  if (n >= 1_000)     return `$${(n / 1_000).toFixed(0)}K`;
   return `$${n}`;
 }
 
-export default function LeadPipelineHealth({ segments }: Props) {
+export default function LeadPipelineHealth({ segments, grow }: { segments: LeadSegment[]; grow?: boolean }) {
   return (
-    <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
-      <div className="px-5 py-4 border-b border-gray-50">
-        <h3 className="text-sm font-semibold text-gray-800">Lead &amp; Pipeline Health</h3>
-        <p className="text-xs text-gray-400 mt-0.5">Segment performance vs targets</p>
+    <div style={{ backgroundColor: C.white, borderRadius: 12, border: `1.5px solid ${C.border}`, overflow: 'hidden', boxShadow: '0 2px 8px rgba(241,90,36,0.08)', display: 'flex', flexDirection: 'column', flex: grow ? 1 : undefined }}>
+      <div style={{ padding: '14px 20px', borderBottom: `1px solid rgba(241,90,36,0.15)`, display: 'flex', alignItems: 'center', gap: 10 }}>
+        <div style={{ width: 3, height: 16, backgroundColor: C.orange, borderRadius: 2 }} />
+        <div>
+          <div style={{ fontSize: 13, fontWeight: 700, color: C.dark }}>Lead &amp; Pipeline Health</div>
+          <div style={{ fontSize: 11, color: C.mid, marginTop: 1 }}>Segment performance vs targets</div>
+        </div>
       </div>
-      <div className="overflow-x-auto">
-        <table className="w-full text-xs">
+      <div style={{ overflowX: 'auto', flex: 1 }}>
+        <table style={{ width: '100%', fontSize: 12, borderCollapse: 'collapse' }}>
           <thead>
-            <tr className="bg-gray-50">
-              <th className="text-left px-4 py-2.5 text-gray-500 font-medium">Segment</th>
-              <th className="text-right px-4 py-2.5 text-gray-500 font-medium">Leads</th>
-              <th className="text-right px-4 py-2.5 text-gray-500 font-medium">Pipeline</th>
-              <th className="text-right px-4 py-2.5 text-gray-500 font-medium">Win Rate</th>
-              <th className="text-center px-4 py-2.5 text-gray-500 font-medium">Status</th>
+            <tr style={{ background: 'rgba(241,90,36,0.04)' }}>
+              {['Segment', 'Leads', 'Pipeline', 'Win Rate', 'Status'].map((h, i) => (
+                <th key={h} style={{ padding: '10px 16px', color: C.orange, fontWeight: 700, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.04em', textAlign: i === 0 ? 'left' : i === 4 ? 'center' : 'right', whiteSpace: 'nowrap' }}>{h}</th>
+              ))}
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-50">
-            {segments.map((s) => (
-              <tr key={s.segment} className="hover:bg-gray-50/60 transition-colors duration-150">
-                <td className="px-4 py-3 font-medium text-gray-800">{s.segment}</td>
-                <td className="px-4 py-3 text-right text-gray-700 tabular-nums">{s.leads}</td>
-                <td className="px-4 py-3 text-right text-gray-700 tabular-nums font-medium">{formatCurrency(s.pipeline)}</td>
-                <td className="px-4 py-3 text-right tabular-nums">
-                  <span className={`font-semibold ${s.winRate >= 35 ? 'text-emerald-600' : s.winRate >= 25 ? 'text-amber-600' : 'text-red-500'}`}>
-                    {s.winRate}%
-                  </span>
-                </td>
-                <td className="px-4 py-3 text-center">
-                  <StatusBadge status={s.status} />
-                </td>
+          <tbody>
+            {segments.length === 0 ? (
+              <tr><td colSpan={5} style={{ padding: '24px 16px', textAlign: 'center', color: C.mid }}>No segment data available</td></tr>
+            ) : segments.map((s, i) => (
+              <tr key={s.segment} style={{ borderTop: '1px solid rgba(241,90,36,0.08)', background: i % 2 === 1 ? 'rgba(241,90,36,0.02)' : C.white }}>
+                <td style={{ padding: '11px 16px', fontWeight: 600, color: C.dark }}>{s.segment}</td>
+                <td style={{ padding: '11px 16px', textAlign: 'right', color: C.mid }}>{s.leads}</td>
+                <td style={{ padding: '11px 16px', textAlign: 'right', fontWeight: 600, color: C.dark }}>{fmt(s.pipeline)}</td>
+                <td style={{ padding: '11px 16px', textAlign: 'right', fontWeight: 700, color: s.winRate >= 35 ? '#16a34a' : s.winRate >= 25 ? '#d97706' : '#dc2626' }}>{s.winRate}%</td>
+                <td style={{ padding: '11px 16px', textAlign: 'center' }}><StatusBadge status={s.status} /></td>
               </tr>
             ))}
           </tbody>

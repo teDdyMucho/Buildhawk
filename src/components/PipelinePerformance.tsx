@@ -1,69 +1,60 @@
 import type { PipelineStage } from '../data/mockData';
 
-interface Props {
-  stages: PipelineStage[];
-}
+const C = { orange: '#F15A24', white: '#FFFFFF', bg: '#F4F5F7', dark: '#2E2E2E', mid: '#6E6E6E' };
+const funnelColors = ['#F15A24', '#e04e1a', '#c94010', '#b23208', '#9b2400'];
 
-function formatCurrency(n: number): string {
+function fmt(n: number) {
   if (n >= 1_000_000) return `$${(n / 1_000_000).toFixed(2)}M`;
-  if (n >= 1_000) return `$${(n / 1_000).toFixed(0)}K`;
+  if (n >= 1_000)     return `$${(n / 1_000).toFixed(0)}K`;
   return `$${n}`;
 }
 
-const stageColors = [
-  'bg-blue-500',
-  'bg-blue-400',
-  'bg-sky-400',
-  'bg-cyan-400',
-  'bg-emerald-500',
-];
-
-export default function PipelinePerformance({ stages }: Props) {
-  const maxValue = Math.max(...stages.map(s => s.value));
+export default function PipelinePerformance({ stages, grow }: { stages: PipelineStage[]; grow?: boolean }) {
+  const maxValue = Math.max(...stages.map(s => s.value), 1);
 
   return (
-    <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
-      <div className="px-5 py-4 border-b border-gray-50">
-        <h3 className="text-sm font-semibold text-gray-800">Pipeline Performance</h3>
-        <p className="text-xs text-gray-400 mt-0.5">Stage-by-stage funnel breakdown</p>
+    <div style={{ backgroundColor: C.white, borderRadius: 12, border: '1.5px solid #F15A24', overflow: 'hidden', boxShadow: '0 2px 8px rgba(241,90,36,0.08)', display: 'flex', flexDirection: 'column', flex: grow ? 1 : undefined }}>
+      <div style={{ padding: '14px 20px', borderBottom: '1px solid rgba(241,90,36,0.15)', display: 'flex', alignItems: 'center', gap: 10 }}>
+        <div style={{ width: 3, height: 16, backgroundColor: C.orange, borderRadius: 2 }} />
+        <div>
+          <div style={{ fontSize: 13, fontWeight: 700, color: C.dark }}>Pipeline Performance</div>
+          <div style={{ fontSize: 11, color: C.mid, marginTop: 1 }}>Stage-by-stage funnel breakdown</div>
+        </div>
       </div>
-      <div className="overflow-x-auto">
-        <table className="w-full text-xs">
+      <div style={{ overflowX: 'auto', flex: 1 }}>
+        <table style={{ width: '100%', fontSize: 12, borderCollapse: 'collapse' }}>
           <thead>
-            <tr className="bg-gray-50">
-              <th className="text-left px-4 py-2.5 text-gray-500 font-medium">Stage</th>
-              <th className="text-right px-4 py-2.5 text-gray-500 font-medium">Value</th>
-              <th className="text-right px-4 py-2.5 text-gray-500 font-medium">Deals</th>
-              <th className="text-left px-4 py-2.5 text-gray-500 font-medium w-28">Progress</th>
-              <th className="text-right px-4 py-2.5 text-gray-500 font-medium">Conv.</th>
+            <tr style={{ background: 'rgba(241,90,36,0.04)' }}>
+              {['Stage', 'Value', 'Deals', 'Progress', 'Conv.'].map((h, i) => (
+                <th key={h} style={{ padding: '10px 16px', color: C.orange, fontWeight: 700, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.04em', textAlign: i === 0 || i === 3 ? 'left' : 'right', whiteSpace: 'nowrap' }}>{h}</th>
+              ))}
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-50">
-            {stages.map((s, i) => (
-              <tr key={s.stage} className="hover:bg-gray-50/60 transition-colors duration-150">
-                <td className="px-4 py-3">
-                  <div className="flex items-center gap-2">
-                    <div className={`w-2 h-2 rounded-full ${stageColors[i]}`} />
-                    <span className="font-medium text-gray-800">{s.stage}</span>
-                  </div>
-                </td>
-                <td className="px-4 py-3 text-right font-semibold text-gray-800 tabular-nums">{formatCurrency(s.value)}</td>
-                <td className="px-4 py-3 text-right text-gray-600 tabular-nums">{s.deals}</td>
-                <td className="px-4 py-3">
-                  <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                    <div
-                      className={`h-full rounded-full transition-all duration-700 ${stageColors[i]}`}
-                      style={{ width: `${(s.value / maxValue) * 100}%` }}
-                    />
-                  </div>
-                </td>
-                <td className="px-4 py-3 text-right tabular-nums">
-                  <span className={`font-semibold ${s.conversion >= 70 ? 'text-emerald-600' : s.conversion >= 50 ? 'text-amber-600' : 'text-blue-600'}`}>
-                    {s.conversion.toFixed(1)}%
-                  </span>
-                </td>
-              </tr>
-            ))}
+          <tbody>
+            {stages.length === 0 ? (
+              <tr><td colSpan={5} style={{ padding: '24px 16px', textAlign: 'center', color: C.mid }}>No pipeline data available</td></tr>
+            ) : stages.map((s, i) => {
+              const bar = funnelColors[i % funnelColors.length];
+              const convColor = s.conversion >= 70 ? '#16a34a' : s.conversion >= 50 ? '#d97706' : C.orange;
+              return (
+                <tr key={s.stage} style={{ borderTop: '1px solid rgba(241,90,36,0.08)', background: i % 2 === 1 ? 'rgba(241,90,36,0.02)' : C.white }}>
+                  <td style={{ padding: '11px 16px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <div style={{ width: 9, height: 9, borderRadius: '50%', backgroundColor: bar, flexShrink: 0 }} />
+                      <span style={{ fontWeight: 600, color: C.dark }}>{s.stage}</span>
+                    </div>
+                  </td>
+                  <td style={{ padding: '11px 16px', textAlign: 'right', fontWeight: 700, color: C.dark }}>{fmt(s.value)}</td>
+                  <td style={{ padding: '11px 16px', textAlign: 'right', color: C.mid }}>{s.deals}</td>
+                  <td style={{ padding: '11px 16px', minWidth: 110 }}>
+                    <div style={{ height: 6, background: C.bg, borderRadius: 3, overflow: 'hidden', border: '1px solid rgba(241,90,36,0.12)' }}>
+                      <div style={{ height: '100%', width: `${(s.value / maxValue) * 100}%`, backgroundColor: bar, borderRadius: 3, transition: 'width 0.7s ease' }} />
+                    </div>
+                  </td>
+                  <td style={{ padding: '11px 16px', textAlign: 'right', fontWeight: 700, color: convColor }}>{s.conversion.toFixed(1)}%</td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>

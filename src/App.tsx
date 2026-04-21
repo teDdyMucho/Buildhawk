@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import {
   Users, Percent, TrendingUp, DollarSign,
   FolderOpen, Clock, Zap, MailCheck,
-  Building2, ChevronRight, RefreshCw,
+  ChevronRight, RefreshCw,
 } from 'lucide-react';
 import KPICard from './components/KPICard';
 import LeadPipelineHealth from './components/LeadPipelineHealth';
@@ -13,9 +13,19 @@ import ExecutiveSummary from './components/ExecutiveSummary';
 import InsightsAlerts from './components/InsightsAlerts';
 import { fetchDashboardData, type BusinessUnit, type DashboardData } from './data/mockData';
 
+const C = {
+  orange:  '#F15A24',
+  white:   '#FFFFFF',
+  bg:      '#F4F5F7',
+  dark:    '#2E2E2E',
+  mid:     '#6E6E6E',
+  silver:  '#BFBFBF',
+  border:  '#E5E7EB',
+};
+
 const BU_OPTIONS: { key: BusinessUnit; label: string }[] = [
-  { key: 'A', label: 'Business Unit A' },
-  { key: 'B', label: 'Business Unit B' },
+  { key: 'A',        label: 'Unit A'   },
+  { key: 'B',        label: 'Unit B'   },
   { key: 'Combined', label: 'Combined' },
 ];
 
@@ -23,19 +33,18 @@ const now = new Date();
 const dateStr = now.toLocaleDateString('en-AU', { day: 'numeric', month: 'long', year: 'numeric' });
 
 export default function App() {
-  const [activeUnit, setActiveUnit] = useState<BusinessUnit>('A');
-  const [visible, setVisible] = useState(true);
-  const [displayUnit, setDisplayUnit] = useState<BusinessUnit>('A');
+  const [activeUnit, setActiveUnit]       = useState<BusinessUnit>('A');
+  const [visible, setVisible]             = useState(true);
+  const [displayUnit, setDisplayUnit]     = useState<BusinessUnit>('A');
   const [dashboardData, setDashboardData] = useState<Record<BusinessUnit, DashboardData> | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading]             = useState(true);
+  const [error, setError]                 = useState<string | null>(null);
 
   const loadData = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const result = await fetchDashboardData();
-      setDashboardData(result);
+      setDashboardData(await fetchDashboardData());
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Failed to load data');
     } finally {
@@ -48,153 +57,130 @@ export default function App() {
   function switchUnit(unit: BusinessUnit) {
     if (unit === activeUnit) return;
     setVisible(false);
-    setTimeout(() => {
-      setDisplayUnit(unit);
-      setActiveUnit(unit);
-      setVisible(true);
-    }, 220);
+    setTimeout(() => { setDisplayUnit(unit); setActiveUnit(unit); setVisible(true); }, 220);
   }
 
-  const data = dashboardData?.[displayUnit];
-  const unitLabel =
-    displayUnit === 'Combined' ? 'All Units' : `Unit ${displayUnit}`;
+  const data      = dashboardData?.[displayUnit];
+  const unitLabel = displayUnit === 'Combined' ? 'All Units' : `Unit ${displayUnit}`;
 
   const kpiCards = !data ? [] : [
-    {
-      title: 'Total Leads',
-      value: data.kpi.totalLeads,
-      trend: data.kpi.totalLeadsTrend,
-      icon: <Users size={16} />,
-      color: 'bg-blue-500',
-      format: 'number' as const,
-    },
-    {
-      title: 'Win Rate',
-      value: data.kpi.winRate,
-      trend: data.kpi.winRateTrend,
-      icon: <Percent size={16} />,
-      color: 'bg-emerald-500',
-      format: 'percent' as const,
-    },
-    {
-      title: 'Pipeline Value',
-      value: data.kpi.pipelineValue,
-      trend: data.kpi.pipelineValueTrend,
-      icon: <TrendingUp size={16} />,
-      color: 'bg-sky-500',
-      format: 'currency' as const,
-    },
-    {
-      title: 'Revenue Forecast',
-      value: data.kpi.revenueForecast,
-      trend: data.kpi.revenueForecastTrend,
-      icon: <DollarSign size={16} />,
-      color: 'bg-teal-500',
-      format: 'currency' as const,
-    },
-    {
-      title: 'Active Projects',
-      value: data.kpi.activeProjects,
-      trend: data.kpi.activeProjectsTrend,
-      icon: <FolderOpen size={16} />,
-      color: 'bg-cyan-600',
-      format: 'number' as const,
-    },
-    {
-      title: 'Avg Turnaround Time',
-      value: data.kpi.avgTurnaround,
-      trend: data.kpi.avgTurnaroundTrend,
-      icon: <Clock size={16} />,
-      color: 'bg-amber-500',
-      format: 'days' as const,
-    },
-    {
-      title: 'Estimator Productivity',
-      value: data.kpi.estimatorProductivity,
-      trend: data.kpi.estimatorProductivityTrend,
-      icon: <Zap size={16} />,
-      color: 'bg-orange-500',
-      format: 'percent' as const,
-    },
-    {
-      title: 'RFQ Response Rate',
-      value: data.kpi.rfqResponseRate,
-      trend: data.kpi.rfqResponseRateTrend,
-      icon: <MailCheck size={16} />,
-      color: 'bg-blue-600',
-      format: 'percent' as const,
-    },
+    { title: 'Total Leads',             value: data.kpi.totalLeads,             trend: data.kpi.totalLeadsTrend,             icon: <Users size={18} />,     format: 'number'   as const },
+    { title: 'Win Rate',                value: data.kpi.winRate,                trend: data.kpi.winRateTrend,                icon: <Percent size={18} />,   format: 'percent'  as const },
+    { title: 'Pipeline Value',          value: data.kpi.pipelineValue,          trend: data.kpi.pipelineValueTrend,          icon: <TrendingUp size={18} />, format: 'currency' as const },
+    { title: 'Revenue Forecast',        value: data.kpi.revenueForecast,        trend: data.kpi.revenueForecastTrend,        icon: <DollarSign size={18} />, format: 'currency' as const },
+    { title: 'Active Projects',         value: data.kpi.activeProjects,         trend: data.kpi.activeProjectsTrend,         icon: <FolderOpen size={18} />, format: 'number'   as const },
+    { title: 'Avg Turnaround Time',     value: data.kpi.avgTurnaround,          trend: data.kpi.avgTurnaroundTrend,          icon: <Clock size={18} />,     format: 'days'     as const },
+    { title: 'Estimator Productivity',  value: data.kpi.estimatorProductivity,  trend: data.kpi.estimatorProductivityTrend,  icon: <Zap size={18} />,       format: 'percent'  as const },
+    { title: 'RFQ Response Rate',       value: data.kpi.rfqResponseRate,        trend: data.kpi.rfqResponseRateTrend,        icon: <MailCheck size={18} />, format: 'percent'  as const },
   ];
 
   return (
-    <div className="min-h-screen bg-slate-50 font-sans">
-      {/* Topbar */}
-      <header className="bg-white border-b border-gray-100 sticky top-0 z-30 shadow-sm">
-        <div className="max-w-screen-2xl mx-auto px-6 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center shadow-sm">
-              <Building2 size={18} className="text-white" />
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-lg font-bold text-gray-900 tracking-tight">BuildHawk</span>
-              <span className="text-xs font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-100">
-                Executive Dashboard
-              </span>
-            </div>
+    <div style={{ minHeight: '100vh', backgroundColor: C.bg, color: C.dark, fontFamily: 'system-ui, sans-serif' }}>
+
+      {/* ── Header ─────────────────────────────────────── */}
+      <header style={{
+        backgroundColor: C.white,
+        borderBottom: `1px solid ${C.border}`,
+        position: 'sticky', top: 0, zIndex: 30,
+        boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
+        overflow: 'visible',
+      }}>
+        <div style={{ maxWidth: 1600, margin: '0 auto', padding: '0 32px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 68 }}>
+
+          {/* Logo — overflows header for large floating look */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+            <img
+              src="/image/logo_2.png"
+              alt="BuildHawk"
+              style={{
+                height: 240,
+                width: 'auto',
+                objectFit: 'contain',
+                position: 'relative',
+                zIndex: 10,
+                filter: 'drop-shadow(0 8px 24px rgba(241,90,36,0.4))',
+              }}
+            />
+            <div style={{ width: 1, height: 36, backgroundColor: C.border }} />
+            <span style={{
+              fontSize: 11, fontWeight: 700, color: C.orange,
+              background: 'rgba(241,90,36,0.08)',
+              padding: '4px 12px', borderRadius: 99,
+              border: '1px solid rgba(241,90,36,0.2)',
+              letterSpacing: '0.05em', textTransform: 'uppercase',
+            }}>
+              Executive Dashboard
+            </span>
           </div>
 
-          <div className="hidden md:flex items-center gap-1.5 text-xs text-gray-400">
-            <span className="font-medium text-gray-600">Dashboard</span>
-            <ChevronRight size={12} />
+          {/* Breadcrumb */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: C.silver }}>
+            <span style={{ color: C.dark, fontWeight: 500 }}>Dashboard</span>
+            <ChevronRight size={12} color={C.silver} />
             <span>Performance</span>
-            <ChevronRight size={12} />
-            <span className="text-blue-600 font-medium">
+            <ChevronRight size={12} color={C.silver} />
+            <span style={{ color: C.orange, fontWeight: 600 }}>
               {activeUnit === 'Combined' ? 'All Units' : `Business Unit ${activeUnit}`}
             </span>
           </div>
 
-          <div className="flex items-center gap-4">
-            <div className="text-right hidden sm:block">
-              <div className="text-[11px] text-gray-400">Report Period</div>
-              <div className="text-xs font-semibold text-gray-700">{dateStr}</div>
+          {/* Right: date + refresh */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+            <div style={{ textAlign: 'right' }}>
+              <div style={{ fontSize: 10, color: C.silver, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Report Period</div>
+              <div style={{ fontSize: 13, fontWeight: 600, color: C.dark }}>{dateStr}</div>
             </div>
             <button
               onClick={loadData}
               disabled={loading}
-              className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 transition-colors duration-150 disabled:opacity-50"
+              style={{
+                padding: 8, borderRadius: 8, background: C.bg,
+                border: `1px solid ${C.border}`, color: C.mid,
+                cursor: 'pointer', opacity: loading ? 0.5 : 1,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}
             >
-              <RefreshCw size={15} className={loading ? 'animate-spin' : ''} />
+              <RefreshCw size={14} className={loading ? 'animate-spin' : ''} style={{ color: loading ? C.orange : C.mid }} />
             </button>
           </div>
         </div>
       </header>
 
-      <main className="max-w-screen-2xl mx-auto px-6 py-5">
+      {/* ── Orange accent stripe below header ───────────── */}
+      <div style={{ height: 3, background: `linear-gradient(90deg, ${C.orange} 0%, rgba(241,90,36,0.3) 100%)` }} />
+
+      <main style={{ maxWidth: 1600, margin: '0 auto', padding: '24px 32px' }}>
+
+        {/* Error */}
         {error && (
-          <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
+          <div style={{ marginBottom: 16, padding: 16, background: 'rgba(239,68,68,0.06)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: 10, fontSize: 13, color: '#dc2626' }}>
             <strong>Error loading data:</strong> {error}
           </div>
         )}
 
-        {/* Header + BU segmented control */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-5">
+        {/* Page title + BU switcher */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24, flexWrap: 'wrap', gap: 12 }}>
           <div>
-            <h1 className="text-xl font-bold text-gray-900">Operations Overview</h1>
-            <p className="text-sm text-gray-400 mt-0.5">
+            <h1 style={{ fontSize: 22, fontWeight: 700, color: C.dark, margin: 0 }}>Operations Overview</h1>
+            <p style={{ fontSize: 13, color: C.mid, marginTop: 4, marginBottom: 0 }}>
               Monthly performance snapshot — figures current to {dateStr}
             </p>
           </div>
 
-          <div className="flex items-center bg-gray-100 rounded-xl p-1 gap-0.5 self-start sm:self-auto">
+          {/* Segmented control */}
+          <div style={{ display: 'flex', background: C.bg, border: `1px solid ${C.border}`, borderRadius: 12, padding: 4, gap: 2 }}>
             {BU_OPTIONS.map(({ key, label }) => (
               <button
                 key={key}
                 onClick={() => switchUnit(key)}
-                className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all duration-200 ${
-                  activeUnit === key
-                    ? 'bg-white text-blue-600 shadow-sm border border-gray-200'
-                    : 'text-gray-500 hover:text-gray-700'
-                }`}
+                style={{
+                  padding: '9px 22px', borderRadius: 9, border: 'none',
+                  fontSize: 13, fontWeight: 600, cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  background: activeUnit === key ? C.orange : 'transparent',
+                  color:      activeUnit === key ? C.white  : C.mid,
+                  boxShadow:  activeUnit === key ? '0 2px 8px rgba(241,90,36,0.3)' : 'none',
+                }}
               >
                 {label}
               </button>
@@ -202,62 +188,53 @@ export default function App() {
           </div>
         </div>
 
-        {/* Animated dashboard content */}
-        {(loading && !dashboardData) ? (
-          <div className="flex items-center justify-center h-64 text-gray-400 text-sm gap-2">
-            <RefreshCw size={16} className="animate-spin" />
+        {/* Loading */}
+        {loading && !dashboardData ? (
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 240, color: C.mid, fontSize: 14, gap: 8 }}>
+            <RefreshCw size={16} className="animate-spin" style={{ color: C.orange }} />
             Loading data from Supabase…
           </div>
         ) : !data ? null : (
-        <div
-          style={{
-            opacity: visible ? 1 : 0,
-            transform: visible ? 'translateY(0)' : 'translateY(10px)',
-            transition: 'opacity 0.25s ease, transform 0.25s ease',
-          }}
-        >
-          {/* KPI Strip */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3 mb-5">
-            {kpiCards.map((card, i) => (
-              <KPICard
-                key={`${displayUnit}-${card.title}`}
-                {...card}
-                animationDelay={i * 55}
-              />
-            ))}
-          </div>
+          <div style={{ opacity: visible ? 1 : 0, transform: visible ? 'translateY(0)' : 'translateY(10px)', transition: 'opacity 0.25s ease, transform 0.25s ease' }}>
 
-          {/* Main grid: 3 columns */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-            {/* LEFT */}
-            <div className="space-y-4">
-              <LeadPipelineHealth segments={data.leadSegments} />
-              <EstimatorProductivity estimators={data.estimators} />
+            {/* KPI strip — 8 cards */}
+            <div className="kpi-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(8, 1fr)', gap: 14, marginBottom: 24 }}>
+              {kpiCards.map((card, i) => (
+                <KPICard key={`${displayUnit}-${card.title}`} {...card} animationDelay={i * 55} />
+              ))}
             </div>
 
-            {/* CENTER */}
-            <div className="space-y-4">
-              <PerformanceRisk indicators={data.riskIndicators} />
-              <PipelinePerformance stages={data.pipelineStages} />
+            {/* 3-column grid — columns are equal height, last card in each stretches to fill */}
+            <div className="main-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 18, alignItems: 'stretch' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+                <LeadPipelineHealth segments={data.leadSegments} />
+                <EstimatorProductivity estimators={data.estimators} grow />
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+                <PerformanceRisk indicators={data.riskIndicators} />
+                <PipelinePerformance stages={data.pipelineStages} grow />
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+                <ExecutiveSummary metrics={data.summaryMetrics} unitLabel={unitLabel} />
+                <InsightsAlerts alerts={data.alerts} grow />
+              </div>
             </div>
 
-            {/* RIGHT */}
-            <div className="space-y-4">
-              <ExecutiveSummary metrics={data.summaryMetrics} unitLabel={unitLabel} />
-              <InsightsAlerts alerts={data.alerts} />
+            {/* Footer */}
+            <div style={{ marginTop: 28, paddingTop: 16, borderTop: `1px solid ${C.border}`, display: 'flex', justifyContent: 'space-between', fontSize: 11, color: C.silver }}>
+              <span>BuildHawk &copy; {now.getFullYear()} — Precision Estimating. Disciplined Delivery.</span>
+              <span>Last refreshed: {now.toLocaleTimeString('en-AU', { hour: '2-digit', minute: '2-digit' })}</span>
             </div>
           </div>
-
-          {/* Footer */}
-          <div className="mt-6 pt-4 border-t border-gray-200 flex items-center justify-between text-[11px] text-gray-400">
-            <span>BuildHawk &copy; {now.getFullYear()} — Executive Intelligence Platform</span>
-            <span>
-              Last refreshed: {now.toLocaleTimeString('en-AU', { hour: '2-digit', minute: '2-digit' })}
-            </span>
-          </div>
-        </div>
         )}
       </main>
+
+      <style>{`
+        @media (max-width: 1200px) { .kpi-grid  { grid-template-columns: repeat(4,1fr) !important; } }
+        @media (max-width: 900px)  { .kpi-grid  { grid-template-columns: repeat(2,1fr) !important; } }
+        @media (max-width: 1100px) { .main-grid { grid-template-columns: 1fr 1fr !important; } }
+        @media (max-width: 700px)  { .main-grid { grid-template-columns: 1fr !important; } }
+      `}</style>
     </div>
   );
 }

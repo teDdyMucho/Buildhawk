@@ -1,71 +1,46 @@
 import type { Alert } from '../data/mockData';
 import { AlertTriangle, AlertCircle, Info } from 'lucide-react';
 
-interface Props {
-  alerts: Alert[];
-}
+const C = { orange: '#F15A24', white: '#FFFFFF', dark: '#2E2E2E', mid: '#6E6E6E' };
 
-const config = {
-  danger: {
-    bg: 'bg-red-50',
-    border: 'border-red-100',
-    icon: 'text-red-500',
-    title: 'text-red-800',
-    desc: 'text-red-600',
-    Icon: AlertCircle,
-    label: 'Critical',
-    labelBg: 'bg-red-100 text-red-700',
-  },
-  warning: {
-    bg: 'bg-amber-50',
-    border: 'border-amber-100',
-    icon: 'text-amber-500',
-    title: 'text-amber-800',
-    desc: 'text-amber-600',
-    Icon: AlertTriangle,
-    label: 'Warning',
-    labelBg: 'bg-amber-100 text-amber-700',
-  },
-  info: {
-    bg: 'bg-blue-50',
-    border: 'border-blue-100',
-    icon: 'text-blue-500',
-    title: 'text-blue-800',
-    desc: 'text-blue-600',
-    Icon: Info,
-    label: 'Info',
-    labelBg: 'bg-blue-100 text-blue-700',
-  },
+const cfg = {
+  danger:  { bg: 'rgba(220,38,38,0.04)',  border: 'rgba(220,38,38,0.15)',  icon: '#dc2626', title: '#991b1b', desc: '#6b7280', Icon: AlertCircle,   label: 'Critical', tagBg: 'rgba(220,38,38,0.1)',  tagColor: '#dc2626' },
+  warning: { bg: 'rgba(217,119,6,0.04)',  border: 'rgba(217,119,6,0.15)',  icon: '#d97706', title: '#92400e', desc: '#6b7280', Icon: AlertTriangle, label: 'Warning',  tagBg: 'rgba(217,119,6,0.1)',  tagColor: '#d97706' },
+  info:    { bg: 'rgba(241,90,36,0.04)',  border: 'rgba(241,90,36,0.15)',  icon: C.orange,  title: C.dark,    desc: C.mid,    Icon: Info,          label: 'Info',     tagBg: 'rgba(241,90,36,0.1)',  tagColor: C.orange  },
 };
 
-export default function InsightsAlerts({ alerts }: Props) {
+export default function InsightsAlerts({ alerts, grow }: { alerts: Alert[]; grow?: boolean }) {
+  const criticalCount = alerts.filter(a => a.type === 'danger').length;
   return (
-    <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
-      <div className="px-5 py-4 border-b border-gray-50 flex items-center justify-between">
-        <div>
-          <h3 className="text-sm font-semibold text-gray-800">Insights &amp; Alerts</h3>
-          <p className="text-xs text-gray-400 mt-0.5">Action items requiring attention</p>
+    <div style={{ backgroundColor: C.white, borderRadius: 12, border: '1.5px solid #F15A24', overflow: 'hidden', boxShadow: '0 2px 8px rgba(241,90,36,0.08)', display: 'flex', flexDirection: 'column', flex: grow ? 1 : undefined }}>
+      <div style={{ padding: '14px 20px', borderBottom: '1px solid rgba(241,90,36,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div style={{ width: 3, height: 16, backgroundColor: C.orange, borderRadius: 2 }} />
+          <div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: C.dark }}>Insights &amp; Alerts</div>
+            <div style={{ fontSize: 11, color: C.mid, marginTop: 1 }}>Action items requiring attention</div>
+          </div>
         </div>
-        <span className="text-xs font-bold text-white bg-red-500 px-2 py-0.5 rounded-full">
-          {alerts.filter(a => a.type === 'danger').length} Critical
-        </span>
+        {criticalCount > 0 && (
+          <span style={{ fontSize: 11, fontWeight: 700, color: C.white, background: '#dc2626', padding: '3px 10px', borderRadius: 99, boxShadow: '0 2px 6px rgba(220,38,38,0.3)' }}>
+            {criticalCount} Critical
+          </span>
+        )}
       </div>
-      <div className="p-4 space-y-2.5">
+      <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 10, flex: 1 }}>
         {alerts.map((alert, i) => {
-          const c = config[alert.type];
+          const c = cfg[alert.type];
           const Icon = c.Icon;
           return (
-            <div key={i} className={`rounded-lg border ${c.border} ${c.bg} p-3.5`}>
-              <div className="flex items-start gap-2.5">
-                <Icon size={15} className={`${c.icon} shrink-0 mt-0.5`} />
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className={`text-xs font-semibold ${c.title} leading-tight`}>{alert.title}</span>
-                    <span className={`shrink-0 text-[10px] font-semibold px-1.5 py-0.5 rounded ${c.labelBg}`}>
-                      {c.label}
-                    </span>
+            <div key={i} style={{ borderRadius: 10, border: `1px solid ${c.border}`, background: c.bg, padding: 14 }}>
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+                <Icon size={15} style={{ color: c.icon, flexShrink: 0, marginTop: 1 }} />
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                    <span style={{ fontSize: 12, fontWeight: 700, color: c.title }}>{alert.title}</span>
+                    <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 4, background: c.tagBg, color: c.tagColor, flexShrink: 0 }}>{c.label}</span>
                   </div>
-                  <p className={`text-[11px] leading-relaxed ${c.desc}`}>{alert.description}</p>
+                  <p style={{ fontSize: 11, lineHeight: 1.6, color: c.desc, margin: 0 }}>{alert.description}</p>
                 </div>
               </div>
             </div>
