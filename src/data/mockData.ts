@@ -410,21 +410,48 @@ function normaliseUnitB(r: any): NormRow {
 }
 
 export async function fetchDashboardData(): Promise<Record<BusinessUnit, DashboardData>> {
-  const [{ data: rawA, error: errA }, { data: rawB, error: errB }] = await Promise.all([
-    supabase.from('lead_qualification_pipeline').select('*'),
+  // Unit A = 4 tables merged together
+  // Unit B = estimating_workflow_pipeline + lead_qualification_pipeline
+  const [
+    { data: rawContract,      error: errContract      },
+    { data: rawEstimating,    error: errEstimating     },
+    { data: rawRFQ,           error: errRFQ            },
+    { data: rawSales,         error: errSales          },
+    { data: rawBWorkflow,     error: errBWorkflow      },
+    { data: rawBLeadQual,     error: errBLeadQual      },
+  ] = await Promise.all([
+    supabase.from('Contract_Administration').select('*'),
+    supabase.from('Estimating_Pipeline').select('*'),
+    supabase.from('RFQ_Pipeline').select('*'),
+    supabase.from('Sales_&_Project_Pipeline').select('*'),
     supabase.from('estimating_workflow_pipeline').select('*'),
+    supabase.from('lead_qualification_pipeline').select('*'),
   ]);
 
-  if (errA) throw new Error(`Unit A fetch failed: ${errA.message}`);
-  if (errB) throw new Error(`Unit B fetch failed: ${errB.message}`);
+  // Log any fetch errors but don't hard-fail — partial data is better than nothing
+  if (errContract)   console.warn('Contract_Administration fetch failed:', errContract.message);
+  if (errEstimating) console.warn('Estimating_Pipeline fetch failed:', errEstimating.message);
+  if (errRFQ)        console.warn('RFQ_Pipeline fetch failed:', errRFQ.message);
+  if (errSales)      console.warn('Sales_&_Project_Pipeline fetch failed:', errSales.message);
+  if (errBWorkflow)  console.warn('estimating_workflow_pipeline fetch failed:', errBWorkflow.message);
+  if (errBLeadQual)  console.warn('lead_qualification_pipeline fetch failed:', errBLeadQual.message);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const rowsA: NormRow[] = ((rawA as any[]) ?? []).map(normaliseUnitA);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const rowsB: NormRow[] = ((rawB as any[]) ?? []).map(normaliseUnitB);
+  const rowsA: NormRow[] = [
+    ...((rawContract   as any[]) ?? []).map(normaliseUnitA),
+    ...((rawEstimating as any[]) ?? []).map(normaliseUnitA),
+    ...((rawRFQ        as any[]) ?? []).map(normaliseUnitA),
+    ...((rawSales      as any[]) ?? []).map(normaliseUnitA),
+  ];
 
-  const unitA = buildDashboard(rowsA, 'Unit A');
-  const unitB = buildDashboard(rowsB, 'Unit B');
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const rowsB: NormRow[] = [
+    ...((rawBWorkflow as any[]) ?? []).map(normaliseUnitB),
+    ...((rawBLeadQual as any[]) ?? []).map(normaliseUnitB),
+  ];
+
+  const unitA    = buildDashboard(rowsA, 'Unit A');
+  const unitB    = buildDashboard(rowsB, 'Unit B');
   const combined = buildCombined(unitA, unitB);
 
   return { A: unitA, B: unitB, Combined: combined };
