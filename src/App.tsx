@@ -11,7 +11,10 @@ import PerformanceRisk from './components/PerformanceRisk';
 import PipelinePerformance from './components/PipelinePerformance';
 import ExecutiveSummary from './components/ExecutiveSummary';
 import InsightsAlerts from './components/InsightsAlerts';
+import CommandCentre from './components/CommandCentre';
 import { fetchDashboardData, type BusinessUnit, type DashboardData } from './data/mockData';
+
+type AppView = 'command' | 'operational';
 
 const C = {
   orange:  '#F15A24',
@@ -24,15 +27,16 @@ const C = {
 };
 
 const BU_OPTIONS: { key: BusinessUnit; label: string }[] = [
-  { key: 'A',        label: 'Unit A'   },
-  { key: 'B',        label: 'Unit B'   },
-  { key: 'Combined', label: 'Combined' },
+  { key: 'A',        label: 'BuildHawk'   },
+  { key: 'B',        label: 'Homes by NH' },
+  { key: 'Combined', label: 'Combined'    },
 ];
 
 const now = new Date();
 const dateStr = now.toLocaleDateString('en-AU', { day: 'numeric', month: 'long', year: 'numeric' });
 
 export default function App() {
+  const [appView, setAppView]             = useState<AppView>('command');
   const [activeUnit, setActiveUnit]       = useState<BusinessUnit>('A');
   const [visible, setVisible]             = useState(true);
   const [displayUnit, setDisplayUnit]     = useState<BusinessUnit>('A');
@@ -61,21 +65,46 @@ export default function App() {
   }
 
   const data      = dashboardData?.[displayUnit];
-  const unitLabel = displayUnit === 'Combined' ? 'All Units' : `Unit ${displayUnit}`;
+  const unitLabel = displayUnit === 'A' ? 'BuildHawk' : displayUnit === 'B' ? 'Homes by NH' : 'Combined';
 
   const kpiCards = !data ? [] : [
-    { title: 'Total Leads',             value: data.kpi.totalLeads,             trend: data.kpi.totalLeadsTrend,             icon: <Users size={18} />,     format: 'number'   as const },
-    { title: 'Win Rate',                value: data.kpi.winRate,                trend: data.kpi.winRateTrend,                icon: <Percent size={18} />,   format: 'percent'  as const },
-    { title: 'Pipeline Value',          value: data.kpi.pipelineValue,          trend: data.kpi.pipelineValueTrend,          icon: <TrendingUp size={18} />, format: 'currency' as const },
-    { title: 'Revenue Forecast',        value: data.kpi.revenueForecast,        trend: data.kpi.revenueForecastTrend,        icon: <DollarSign size={18} />, format: 'currency' as const },
-    { title: 'Active Projects',         value: data.kpi.activeProjects,         trend: data.kpi.activeProjectsTrend,         icon: <FolderOpen size={18} />, format: 'number'   as const },
-    { title: 'Avg Turnaround Time',     value: data.kpi.avgTurnaround,          trend: data.kpi.avgTurnaroundTrend,          icon: <Clock size={18} />,     format: 'days'     as const },
-    { title: 'Estimator Productivity',  value: data.kpi.estimatorProductivity,  trend: data.kpi.estimatorProductivityTrend,  icon: <Zap size={18} />,       format: 'percent'  as const },
-    { title: 'RFQ Response Rate',       value: data.kpi.rfqResponseRate,        trend: data.kpi.rfqResponseRateTrend,        icon: <MailCheck size={18} />, format: 'percent'  as const },
+    { title: 'Total Leads',            value: data.kpi.totalLeads,            trend: data.kpi.totalLeadsTrend,            icon: <Users size={18} />,     format: 'number'   as const },
+    { title: 'Win Rate (Decided)',      value: data.kpi.winRate,               trend: data.kpi.winRateTrend,               icon: <Percent size={18} />,   format: 'percent'  as const },
+    { title: 'Pipeline Value',         value: data.kpi.pipelineValue,         trend: data.kpi.pipelineValueTrend,         icon: <TrendingUp size={18} />, format: 'currency' as const },
+    { title: 'Revenue Forecast',       value: data.kpi.revenueForecast,       trend: data.kpi.revenueForecastTrend,       icon: <DollarSign size={18} />, format: 'currency' as const },
+    { title: 'Open Leads',             value: data.kpi.activeProjects,        trend: data.kpi.activeProjectsTrend,        icon: <FolderOpen size={18} />, format: 'number'   as const },
+    { title: 'Avg Days in Pipeline',   value: data.kpi.avgTurnaround,         trend: data.kpi.avgTurnaroundTrend,         icon: <Clock size={18} />,     format: 'days'     as const },
+    { title: 'Estimator Win Rate',     value: data.kpi.estimatorProductivity, trend: data.kpi.estimatorProductivityTrend, icon: <Zap size={18} />,       format: 'percent'  as const },
+    { title: 'Lead Assignment Rate',   value: data.kpi.rfqResponseRate,       trend: data.kpi.rfqResponseRateTrend,       icon: <MailCheck size={18} />, format: 'percent'  as const },
   ];
+
+  if (appView === 'command') {
+    return (
+      <>
+        {/* App-level switcher bar */}
+        <div style={{ background: '#0f172a', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4, padding: '6px 0' }}>
+          {([['command', 'Command Centre'], ['operational', 'Operational Dashboard']] as [AppView, string][]).map(([key, label]) => (
+            <button key={key} onClick={() => setAppView(key)} style={{ padding: '5px 20px', borderRadius: 6, border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 700, background: appView === key ? '#DE5123' : 'rgba(255,255,255,0.08)', color: '#fff', transition: 'all 0.2s' }}>
+              {label}
+            </button>
+          ))}
+        </div>
+        <CommandCentre />
+      </>
+    );
+  }
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: C.bg, color: C.dark, fontFamily: 'system-ui, sans-serif' }}>
+
+      {/* App-level switcher bar */}
+      <div style={{ background: '#0f172a', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4, padding: '6px 0' }}>
+        {([['command', 'Command Centre'], ['operational', 'Operational Dashboard']] as [AppView, string][]).map(([key, label]) => (
+          <button key={key} onClick={() => setAppView(key as AppView)} style={{ padding: '5px 20px', borderRadius: 6, border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 700, background: appView === key ? '#DE5123' : 'rgba(255,255,255,0.08)', color: '#fff', transition: 'all 0.2s' }}>
+            {label}
+          </button>
+        ))}
+      </div>
 
       {/* ── Header ─────────────────────────────────────── */}
       <header style={{
@@ -120,7 +149,7 @@ export default function App() {
             <span>Performance</span>
             <ChevronRight size={12} color={C.silver} />
             <span style={{ color: C.orange, fontWeight: 600 }}>
-              {activeUnit === 'Combined' ? 'All Units' : `Business Unit ${activeUnit}`}
+              {activeUnit === 'A' ? 'BuildHawk' : activeUnit === 'B' ? 'Homes by NH' : 'Combined'}
             </span>
           </div>
 
