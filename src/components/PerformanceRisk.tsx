@@ -2,7 +2,7 @@ import type { RiskIndicator } from '../data/mockData';
 import StatusBadge from './StatusBadge';
 import { ShieldCheck, Target, Clock } from 'lucide-react';
 
-const C = { orange: '#F15A24', white: '#FFFFFF', bg: '#F4F5F7', dark: '#2E2E2E', mid: '#6E6E6E' };
+const C = { orange: '#DE5123', white: '#FFFFFF', bg: '#f1f5f9', dark: '#0f172a', mid: '#64748b', border: '#e2e8f0' };
 const icons = [ShieldCheck, Target, Clock];
 
 const lvl: Record<string, { border: string; bg: string; bar: string; val: string; iconBg: string }> = {
@@ -13,8 +13,8 @@ const lvl: Record<string, { border: string; bg: string; bar: string; val: string
 
 export default function PerformanceRisk({ indicators, grow }: { indicators: RiskIndicator[]; grow?: boolean }) {
   return (
-    <div style={{ backgroundColor: C.white, borderRadius: 12, border: '1.5px solid #F15A24', overflow: 'hidden', boxShadow: '0 2px 8px rgba(241,90,36,0.08)', display: 'flex', flexDirection: 'column', flex: grow ? 1 : undefined }}>
-      <div style={{ padding: '14px 20px', borderBottom: '1px solid rgba(241,90,36,0.15)', display: 'flex', alignItems: 'center', gap: 10 }}>
+    <div style={{ backgroundColor: C.white, borderRadius: 10, border: `1px solid ${C.border}`, overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.07)', display: 'flex', flexDirection: 'column', flex: grow ? 1 : undefined }}>
+      <div style={{ padding: '14px 20px', borderBottom: `1px solid ${C.border}`, display: 'flex', alignItems: 'center', gap: 10 }}>
         <div style={{ width: 3, height: 16, backgroundColor: C.orange, borderRadius: 2 }} />
         <div>
           <div style={{ fontSize: 13, fontWeight: 700, color: C.dark }}>Performance &amp; Risk Overview</div>
@@ -43,7 +43,7 @@ export default function PerformanceRisk({ indicators, grow }: { indicators: Risk
                 {ind.label.includes('Turnaround') ? `${ind.value.toFixed(1)}d` : `${ind.value.toFixed(1)}%`}
               </div>
               <p style={{ fontSize: 11, color: C.mid, margin: '0 0 10px', lineHeight: 1.5 }}>{ind.description}</p>
-              <div style={{ height: 5, background: C.bg, borderRadius: 3, overflow: 'hidden', border: '1px solid rgba(241,90,36,0.12)' }}>
+              <div style={{ height: 5, background: C.bg, borderRadius: 3, overflow: 'hidden', border: `1px solid ${C.border}` }}>
                 <div style={{ height: '100%', width: `${barW}%`, backgroundColor: s.bar, borderRadius: 3, transition: 'width 0.7s ease' }} />
               </div>
             </div>

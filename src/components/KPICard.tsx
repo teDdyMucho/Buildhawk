@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
 
-const C = { orange: '#F15A24', white: '#FFFFFF', dark: '#2E2E2E', mid: '#6E6E6E', silver: '#BFBFBF', border: '#E5E7EB' };
+const C = { orange: '#DE5123', white: '#FFFFFF', dark: '#0f172a', mid: '#64748b', silver: '#94a3b8', border: '#e2e8f0' };
 
 interface KPICardProps {
   title: string;
@@ -61,10 +61,10 @@ export default function KPICard({ title, value, trend, icon, format, animationDe
       onMouseLeave={() => setHovered(false)}
       style={{
         position: 'relative', backgroundColor: C.white, borderRadius: 12,
-        border: hovered ? '2.5px solid #F15A24' : `1px solid ${C.border}`,
+        border: hovered ? `2.5px solid ${C.orange}` : `1px solid ${C.border}`,
         overflow: 'hidden',
         boxShadow: hovered
-          ? '0 0 0 4px rgba(241,90,36,0.15), 0 8px 24px rgba(241,90,36,0.25)'
+          ? '0 0 0 4px rgba(222,81,35,0.15), 0 8px 24px rgba(222,81,35,0.25)'
           : '0 1px 4px rgba(0,0,0,0.06)',
         opacity: visible ? 1 : 0,
         transform: visible ? (hovered ? 'translateY(-3px) scale(1.03)' : 'translateY(0)') : 'translateY(12px)',
@@ -73,12 +73,12 @@ export default function KPICard({ title, value, trend, icon, format, animationDe
       }}
     >
       {/* Orange top accent */}
-      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: hovered ? 4 : 3, backgroundColor: C.orange, transition: 'height 0.2s ease', boxShadow: hovered ? '0 2px 8px rgba(241,90,36,0.5)' : 'none' }} />
+      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: hovered ? 4 : 3, backgroundColor: C.orange, transition: 'height 0.2s ease', boxShadow: hovered ? '0 2px 8px rgba(222,81,35,0.5)' : 'none' }} />
 
       <div style={{ padding: '18px 16px 14px' }}>
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 14 }}>
           {/* Icon */}
-          <div style={{ padding: 9, borderRadius: 9, background: 'rgba(241,90,36,0.1)', color: C.orange, display: 'flex' }}>
+          <div style={{ padding: 9, borderRadius: 9, background: 'rgba(222,81,35,0.1)', color: C.orange, display: 'flex' }}>
             {icon}
           </div>
           {/* Trend */}

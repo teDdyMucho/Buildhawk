@@ -6,7 +6,7 @@ import {
 import {
   User, DollarSign, TrendingUp, AlertCircle, FileText, Award, Bell,
   Wallet, Clock, TrendingDown, CalendarDays, AlertTriangle, Layers,
-  RefreshCw, Building2, HardHat,
+  RefreshCw, Building2,
 } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 
@@ -556,7 +556,12 @@ function CashflowView({ data }: { data: CommandData }) {
 }
 
 // ─── Main CommandCentre component ─────────────────────────────────────────────
-export default function CommandCentre() {
+interface CommandCentreProps {
+  appView: 'command' | 'operational';
+  setAppView: (v: 'command' | 'operational') => void;
+}
+
+export default function CommandCentre({ appView, setAppView }: CommandCentreProps) {
   const [view, setView]       = useState<'commercial' | 'cashflow'>('commercial');
   const [data, setData]       = useState<CommandData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -580,17 +585,23 @@ export default function CommandCentre() {
 
   return (
     <div style={{ minHeight: '100vh', background: C.bg, fontFamily: 'system-ui, -apple-system, sans-serif' }}>
+      {/* App-level switcher bar */}
+      <div style={{ background: '#0f172a', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4, padding: '6px 0' }}>
+        {([['command', 'Command Centre'], ['operational', 'Operational Dashboard']] as ['command' | 'operational', string][]).map(([key, label]) => (
+          <button key={key} onClick={() => setAppView(key)} style={{ padding: '5px 20px', borderRadius: 6, border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 700, background: appView === key ? ORANGE : 'rgba(255,255,255,0.08)', color: '#fff', transition: 'all 0.2s' }}>
+            {label}
+          </button>
+        ))}
+      </div>
+
       {/* Header */}
-      <div style={{ background: `linear-gradient(135deg, #1e3a5f 0%, #1e40af 60%, #2563eb 100%)`, color: '#fff' }}>
-        <div style={{ maxWidth: 1500, margin: '0 auto', padding: '0 24px', height: 60, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div style={{ background: `linear-gradient(135deg, #1e3a5f 0%, #1e40af 60%, #2563eb 100%)`, color: '#fff', overflow: 'visible' }}>
+        <div style={{ maxWidth: 1500, margin: '0 auto', padding: '0 24px', height: 60, display: 'flex', alignItems: 'center', justifyContent: 'space-between', overflow: 'visible' }}>
           {/* Logo + title */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-            <div style={{ width: 36, height: 36, background: '#fff', borderRadius: 7, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <HardHat size={20} color={ORANGE} />
-            </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+            <img src="/image/logo_2.png" alt="BuildHawk" style={{ height: 120, width: 'auto', objectFit: 'contain' }} />
             <div>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: 10 }}>
-                <span style={{ fontWeight: 800, fontSize: 18, letterSpacing: '-0.5px' }}>BuildHawk</span>
                 <span style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 2, opacity: 0.8 }}>Command Centre</span>
               </div>
               <div style={{ fontSize: 10, opacity: 0.6, fontStyle: 'italic', marginTop: 1 }}>Control today. Predict tomorrow.</div>

@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import {
   Users, Percent, TrendingUp, DollarSign,
   FolderOpen, Clock, Zap, MailCheck,
-  ChevronRight, RefreshCw,
+  RefreshCw,
 } from 'lucide-react';
 import KPICard from './components/KPICard';
 import LeadPipelineHealth from './components/LeadPipelineHealth';
@@ -17,13 +17,13 @@ import { fetchDashboardData, type BusinessUnit, type DashboardData } from './dat
 type AppView = 'command' | 'operational';
 
 const C = {
-  orange:  '#F15A24',
+  orange:  '#DE5123',
   white:   '#FFFFFF',
-  bg:      '#F4F5F7',
-  dark:    '#2E2E2E',
-  mid:     '#6E6E6E',
-  silver:  '#BFBFBF',
-  border:  '#E5E7EB',
+  bg:      '#f1f5f9',
+  dark:    '#0f172a',
+  mid:     '#64748b',
+  silver:  '#94a3b8',
+  border:  '#e2e8f0',
 };
 
 const BU_OPTIONS: { key: BusinessUnit; label: string }[] = [
@@ -79,104 +79,73 @@ export default function App() {
   ];
 
   if (appView === 'command') {
-    return (
-      <>
-        {/* App-level switcher bar */}
-        <div style={{ background: '#0f172a', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4, padding: '6px 0' }}>
-          {([['command', 'Command Centre'], ['operational', 'Operational Dashboard']] as [AppView, string][]).map(([key, label]) => (
-            <button key={key} onClick={() => setAppView(key)} style={{ padding: '5px 20px', borderRadius: 6, border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 700, background: appView === key ? '#DE5123' : 'rgba(255,255,255,0.08)', color: '#fff', transition: 'all 0.2s' }}>
-              {label}
-            </button>
-          ))}
-        </div>
-        <CommandCentre />
-      </>
-    );
+    return <CommandCentre appView={appView} setAppView={setAppView} />;
   }
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: C.bg, color: C.dark, fontFamily: 'system-ui, sans-serif' }}>
+    <div style={{ minHeight: '100vh', backgroundColor: C.bg, color: C.dark, fontFamily: 'system-ui, -apple-system, sans-serif' }}>
 
       {/* App-level switcher bar */}
       <div style={{ background: '#0f172a', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4, padding: '6px 0' }}>
         {([['command', 'Command Centre'], ['operational', 'Operational Dashboard']] as [AppView, string][]).map(([key, label]) => (
-          <button key={key} onClick={() => setAppView(key as AppView)} style={{ padding: '5px 20px', borderRadius: 6, border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 700, background: appView === key ? '#DE5123' : 'rgba(255,255,255,0.08)', color: '#fff', transition: 'all 0.2s' }}>
+          <button key={key} onClick={() => setAppView(key)} style={{ padding: '5px 20px', borderRadius: 6, border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 700, background: appView === key ? C.orange : 'rgba(255,255,255,0.08)', color: '#fff', transition: 'all 0.2s' }}>
             {label}
           </button>
         ))}
       </div>
 
-      {/* ── Header ─────────────────────────────────────── */}
+      {/* ── Header — navy gradient bar, matches Command Centre ───── */}
       <header style={{
-        backgroundColor: C.white,
-        borderBottom: `1px solid ${C.border}`,
+        background: `linear-gradient(135deg, #1e3a5f 0%, #1e40af 60%, #2563eb 100%)`,
+        color: '#fff',
         position: 'sticky', top: 0, zIndex: 30,
-        boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
+        boxShadow: '0 2px 12px rgba(0,0,0,0.12)',
         overflow: 'visible',
       }}>
-        <div style={{ maxWidth: 1600, margin: '0 auto', padding: '0 32px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 68 }}>
+        <div style={{ maxWidth: 1600, margin: '0 auto', padding: '0 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 60, overflow: 'visible' }}>
 
-          {/* Logo — overflows header for large floating look */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-            <img
-              src="/image/logo_2.png"
-              alt="BuildHawk"
-              style={{
-                height: 240,
-                width: 'auto',
-                objectFit: 'contain',
-                position: 'relative',
-                zIndex: 10,
-                filter: 'drop-shadow(0 8px 24px rgba(241,90,36,0.4))',
-              }}
-            />
-            <div style={{ width: 1, height: 36, backgroundColor: C.border }} />
-            <span style={{
-              fontSize: 11, fontWeight: 700, color: C.orange,
-              background: 'rgba(241,90,36,0.08)',
-              padding: '4px 12px', borderRadius: 99,
-              border: '1px solid rgba(241,90,36,0.2)',
-              letterSpacing: '0.05em', textTransform: 'uppercase',
-            }}>
-              Executive Dashboard
-            </span>
+          {/* Logo + title */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+            <img src="/image/logo_2.png" alt="BuildHawk" style={{ height: 120, width: 'auto', objectFit: 'contain' }} />
+            <div>
+              <span style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 2, opacity: 0.8 }}>Operational Dashboard</span>
+              <div style={{ fontSize: 10, opacity: 0.6, fontStyle: 'italic', marginTop: 1 }}>Monthly performance snapshot</div>
+            </div>
           </div>
 
-          {/* Breadcrumb */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: C.silver }}>
-            <span style={{ color: C.dark, fontWeight: 500 }}>Dashboard</span>
-            <ChevronRight size={12} color={C.silver} />
-            <span>Performance</span>
-            <ChevronRight size={12} color={C.silver} />
-            <span style={{ color: C.orange, fontWeight: 600 }}>
-              {activeUnit === 'A' ? 'BuildHawk' : activeUnit === 'B' ? 'Homes by NH' : 'Combined'}
-            </span>
+          {/* BU segmented control */}
+          <div style={{ display: 'flex', background: 'rgba(255,255,255,0.12)', borderRadius: 8, padding: 3, gap: 2 }}>
+            {BU_OPTIONS.map(({ key, label }) => (
+              <button
+                key={key}
+                onClick={() => switchUnit(key)}
+                style={{
+                  padding: '7px 18px', borderRadius: 6, border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 700, transition: 'all 0.2s',
+                  background: activeUnit === key ? '#fff' : 'transparent',
+                  color:      activeUnit === key ? '#1e40af' : 'rgba(255,255,255,0.85)',
+                }}
+              >
+                {label}
+              </button>
+            ))}
           </div>
 
           {/* Right: date + refresh */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-            <div style={{ textAlign: 'right' }}>
-              <div style={{ fontSize: 10, color: C.silver, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Report Period</div>
-              <div style={{ fontSize: 13, fontWeight: 600, color: C.dark }}>{dateStr}</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+            <div style={{ fontSize: 11, opacity: 0.7, textAlign: 'right' }}>
+              <div>Report Period</div>
+              <div style={{ fontWeight: 600 }}>{dateStr}</div>
             </div>
             <button
               onClick={loadData}
               disabled={loading}
-              style={{
-                padding: 8, borderRadius: 8, background: C.bg,
-                border: `1px solid ${C.border}`, color: C.mid,
-                cursor: 'pointer', opacity: loading ? 0.5 : 1,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-              }}
+              style={{ padding: 8, borderRadius: 7, background: 'rgba(255,255,255,0.15)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: loading ? 0.5 : 1 }}
             >
-              <RefreshCw size={14} className={loading ? 'animate-spin' : ''} style={{ color: loading ? C.orange : C.mid }} />
+              <RefreshCw size={15} color="#fff" className={loading ? 'animate-spin' : ''} />
             </button>
           </div>
         </div>
       </header>
-
-      {/* ── Orange accent stripe below header ───────────── */}
-      <div style={{ height: 3, background: `linear-gradient(90deg, ${C.orange} 0%, rgba(241,90,36,0.3) 100%)` }} />
 
       <main style={{ maxWidth: 1600, margin: '0 auto', padding: '24px 32px' }}>
 
@@ -187,34 +156,12 @@ export default function App() {
           </div>
         )}
 
-        {/* Page title + BU switcher */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24, flexWrap: 'wrap', gap: 12 }}>
-          <div>
-            <h1 style={{ fontSize: 22, fontWeight: 700, color: C.dark, margin: 0 }}>Operations Overview</h1>
-            <p style={{ fontSize: 13, color: C.mid, marginTop: 4, marginBottom: 0 }}>
-              Monthly performance snapshot — figures current to {dateStr}
-            </p>
-          </div>
-
-          {/* Segmented control */}
-          <div style={{ display: 'flex', background: C.bg, border: `1px solid ${C.border}`, borderRadius: 12, padding: 4, gap: 2 }}>
-            {BU_OPTIONS.map(({ key, label }) => (
-              <button
-                key={key}
-                onClick={() => switchUnit(key)}
-                style={{
-                  padding: '9px 22px', borderRadius: 9, border: 'none',
-                  fontSize: 13, fontWeight: 600, cursor: 'pointer',
-                  transition: 'all 0.2s ease',
-                  background: activeUnit === key ? C.orange : 'transparent',
-                  color:      activeUnit === key ? C.white  : C.mid,
-                  boxShadow:  activeUnit === key ? '0 2px 8px rgba(241,90,36,0.3)' : 'none',
-                }}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
+        {/* Page title */}
+        <div style={{ marginBottom: 24 }}>
+          <h1 style={{ fontSize: 22, fontWeight: 700, color: C.dark, margin: 0 }}>Operations Overview</h1>
+          <p style={{ fontSize: 13, color: C.mid, marginTop: 4, marginBottom: 0 }}>
+            Monthly performance snapshot — figures current to {dateStr}
+          </p>
         </div>
 
         {/* Loading */}

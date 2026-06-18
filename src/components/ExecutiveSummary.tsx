@@ -1,13 +1,13 @@
 import type { SummaryMetric } from '../data/mockData';
 import { DollarSign, BarChart2, FolderOpen, Percent, Users } from 'lucide-react';
 
-const C = { orange: '#F15A24', white: '#FFFFFF', bg: '#F4F5F7', dark: '#2E2E2E', mid: '#6E6E6E' };
+const C = { orange: '#DE5123', white: '#FFFFFF', bg: '#f1f5f9', dark: '#0f172a', mid: '#64748b', border: '#e2e8f0' };
 const icons = [DollarSign, BarChart2, FolderOpen, Percent, Users];
 
 export default function ExecutiveSummary({ metrics, unitLabel, grow }: { metrics: SummaryMetric[]; unitLabel: string; grow?: boolean }) {
   return (
-    <div style={{ backgroundColor: C.white, borderRadius: 12, border: '1.5px solid #F15A24', overflow: 'hidden', boxShadow: '0 2px 8px rgba(241,90,36,0.08)', display: 'flex', flexDirection: 'column', flex: grow ? 1 : undefined }}>
-      <div style={{ padding: '14px 20px', borderBottom: '1px solid rgba(241,90,36,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+    <div style={{ backgroundColor: C.white, borderRadius: 10, border: `1px solid ${C.border}`, overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.07)', display: 'flex', flexDirection: 'column', flex: grow ? 1 : undefined }}>
+      <div style={{ padding: '14px 20px', borderBottom: `1px solid ${C.border}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <div style={{ width: 3, height: 16, backgroundColor: C.orange, borderRadius: 2 }} />
           <div>
@@ -15,7 +15,7 @@ export default function ExecutiveSummary({ metrics, unitLabel, grow }: { metrics
             <div style={{ fontSize: 11, color: C.mid, marginTop: 1 }}>Key metrics at a glance</div>
           </div>
         </div>
-        <span style={{ fontSize: 11, fontWeight: 700, color: C.white, background: C.orange, padding: '4px 12px', borderRadius: 99, boxShadow: '0 2px 8px rgba(241,90,36,0.3)' }}>
+        <span style={{ fontSize: 11, fontWeight: 700, color: C.white, background: C.orange, padding: '4px 12px', borderRadius: 99, boxShadow: '0 2px 8px rgba(222,81,35,0.3)' }}>
           {unitLabel}
         </span>
       </div>
@@ -23,9 +23,9 @@ export default function ExecutiveSummary({ metrics, unitLabel, grow }: { metrics
         {metrics.map((m, i) => {
           const Icon = icons[i % icons.length];
           return (
-            <div key={m.label} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: C.bg, border: '1px solid rgba(241,90,36,0.12)', borderRadius: 9, padding: '11px 14px' }}>
+            <div key={m.label} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: C.bg, border: `1px solid ${C.border}`, borderRadius: 9, padding: '11px 14px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <div style={{ padding: 7, borderRadius: 7, background: 'rgba(241,90,36,0.1)' }}>
+                <div style={{ padding: 7, borderRadius: 7, background: 'rgba(222,81,35,0.1)' }}>
                   <Icon size={13} style={{ color: C.orange }} />
                 </div>
                 <div>

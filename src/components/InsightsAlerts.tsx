@@ -1,19 +1,19 @@
 import type { Alert } from '../data/mockData';
 import { AlertTriangle, AlertCircle, Info } from 'lucide-react';
 
-const C = { orange: '#F15A24', white: '#FFFFFF', dark: '#2E2E2E', mid: '#6E6E6E' };
+const C = { orange: '#DE5123', white: '#FFFFFF', dark: '#0f172a', mid: '#64748b', border: '#e2e8f0' };
 
 const cfg = {
   danger:  { bg: 'rgba(220,38,38,0.04)',  border: 'rgba(220,38,38,0.15)',  icon: '#dc2626', title: '#991b1b', desc: '#6b7280', Icon: AlertCircle,   label: 'Critical', tagBg: 'rgba(220,38,38,0.1)',  tagColor: '#dc2626' },
   warning: { bg: 'rgba(217,119,6,0.04)',  border: 'rgba(217,119,6,0.15)',  icon: '#d97706', title: '#92400e', desc: '#6b7280', Icon: AlertTriangle, label: 'Warning',  tagBg: 'rgba(217,119,6,0.1)',  tagColor: '#d97706' },
-  info:    { bg: 'rgba(241,90,36,0.04)',  border: 'rgba(241,90,36,0.15)',  icon: C.orange,  title: C.dark,    desc: C.mid,    Icon: Info,          label: 'Info',     tagBg: 'rgba(241,90,36,0.1)',  tagColor: C.orange  },
+  info:    { bg: 'rgba(222,81,35,0.04)',  border: 'rgba(222,81,35,0.15)',  icon: C.orange,  title: C.dark,    desc: C.mid,    Icon: Info,          label: 'Info',     tagBg: 'rgba(222,81,35,0.1)',  tagColor: C.orange  },
 };
 
 export default function InsightsAlerts({ alerts, grow }: { alerts: Alert[]; grow?: boolean }) {
   const criticalCount = alerts.filter(a => a.type === 'danger').length;
   return (
-    <div style={{ backgroundColor: C.white, borderRadius: 12, border: '1.5px solid #F15A24', overflow: 'hidden', boxShadow: '0 2px 8px rgba(241,90,36,0.08)', display: 'flex', flexDirection: 'column', flex: grow ? 1 : undefined }}>
-      <div style={{ padding: '14px 20px', borderBottom: '1px solid rgba(241,90,36,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+    <div style={{ backgroundColor: C.white, borderRadius: 10, border: `1px solid ${C.border}`, overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.07)', display: 'flex', flexDirection: 'column', flex: grow ? 1 : undefined }}>
+      <div style={{ padding: '14px 20px', borderBottom: `1px solid ${C.border}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <div style={{ width: 3, height: 16, backgroundColor: C.orange, borderRadius: 2 }} />
           <div>
